@@ -1,0 +1,36 @@
+# Example configuration file
+elements_config:
+  - name: "postgresql"
+    port: 5432
+    element_type: "Service"
+    service_name: "postgresql"
+
+  - name: "mysql"
+    port: 3306
+    element_type: "Service"
+    service_name: "mysql"
+
+  - name: "http_server"
+    port: 8081
+    element_type: "Command"
+    command: "python3"
+    args: 
+      - "-m"
+      - "http.server"
+      - "8081"
+
+  - name: "api"
+    port: 8084
+    element_type: "Command"
+    command: "/home/sergi/mi_api/venv/bin/python"
+    args: 
+      - "-m"
+      - "uvicorn"
+      - "main:app"
+      - "--app-dir"
+      - "/home/sergi/mi_api"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8084"
+    log_file: "logs/fastapi.log"
