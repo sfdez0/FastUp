@@ -13,7 +13,7 @@ elements_config:
   - name: "http_server"
     port: 8081
     element_type: "Command"
-    command: "python3"
+    start_command: "python3"
     args: 
       - "-m"
       - "http.server"
@@ -22,7 +22,7 @@ elements_config:
   - name: "api"
     port: 8084
     element_type: "Command"
-    command: "/home/sergi/mi_api/venv/bin/python"
+    start_command: "/home/sergi/mi_api/venv/bin/python"
     args: 
       - "-m"
       - "uvicorn"

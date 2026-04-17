@@ -40,7 +40,7 @@ pub enum ElementType {
     /// Element that is started with a custom command
     Command {
         /// Command to start the element
-        command: String,
+        start_command: String,
         /// Arguments for the start command
         args: Vec<String>,
         /// Optional PID route to validate the element status
@@ -59,12 +59,12 @@ impl ElementType {
     pub fn start(&self) -> std::io::Result<u32> {
         match self {
             ElementType::Command {
-                command,
+                start_command,
                 args,
                 log_file,
             } => {
                 // Command -> We start the element with the provided command and arguments
-                let mut process = Command::new(command);
+                let mut process = Command::new(start_command);
                 process.args(args);
 
                 // If a log file is provided, redirect stdout and stderr to that file. Otherwise, discard the output
@@ -106,12 +106,12 @@ impl ElementType {
 
         match self {
             ElementType::Command {
-                command: element_command,
+                start_command,
                 args: _,
                 log_file: _,
             } => {
                 // Command -> Kill the process with the given PID, first validating that it is the expected element
-                if state.validate(command, element_command) {
+                if state.validate(command, start_command) {
                     let sys = System::new_all();
                     if let Some(process) = sys.process(Pid::from(pid)) {
                         process.kill();
