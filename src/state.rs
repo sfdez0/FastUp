@@ -105,9 +105,11 @@ impl FastUpState {
         println!("Validating element '{}'...", command);
 
         if let Some(info) = self.elements.get(command) {
-            // Refresh system info to get the current processes
-            let mut sys = System::new_all();
-            sys.refresh_all();
+            // Refresh system info (only processes)
+            let mut sys = System::new();
+            // Specifically refresh the command, but no other info to minimize the time spent refreshing
+            let kind = sysinfo::ProcessRefreshKind::nothing().with_cmd(sysinfo::UpdateKind::Always);
+            sys.refresh_processes_specifics(sysinfo::ProcessesToUpdate::All, true, kind);
 
             // Check if the PID is still running and corresponds to the expected element
             if let Some(process) = sys.process(Pid::from(info.pid)) {
@@ -145,9 +147,14 @@ impl FastUpState {
     /// Returns the updated list of running elements.
     /// - `self`: The current state to be cleaned up
     pub fn cleanup_dead_elements(&mut self) -> std::io::Result<()> {
-        // Refresh system info to get the current processes
-        let mut sys = System::new_all();
-        sys.refresh_all();
+        // Refresh system info (only processes)
+        let mut sys = System::new();
+        // Only need PIDs running, no need to refresh other info to minimize the time spent refreshing
+        sys.refresh_processes_specifics(
+            sysinfo::ProcessesToUpdate::All,
+            true,
+            sysinfo::ProcessRefreshKind::nothing(),
+        );
 
         // Remove elements whose PIDs are no longer running
         self.elements

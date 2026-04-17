@@ -164,9 +164,14 @@ fn cmd_close(name: &str) {
             if let Some(info) = state.get_element(&element.name) {
                 let mut pid = info.pid;
 
-                // Refresh system info
-                let mut sys = System::new_all();
-                sys.refresh_all();
+                // Refresh system info (only processes)
+                let mut sys = System::new();
+                // Only need PIDs running, no need to refresh other info to minimize the time spent refreshing
+                sys.refresh_processes_specifics(
+                    sysinfo::ProcessesToUpdate::All,
+                    true,
+                    sysinfo::ProcessRefreshKind::nothing(),
+                );
 
                 // If the cached PID is not running, try to find the current PID of the element.
                 if sys.process(Pid::from(pid)).is_none() {
