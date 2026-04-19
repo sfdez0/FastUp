@@ -102,8 +102,6 @@ impl ElementType {
 
     /// Stop the element given its PID and element type
     pub fn stop(&self, pid: usize, state: &mut FastUpState, command: &str) -> std::io::Result<()> {
-        println!("Stopping element {}...", command.green());
-
         match self {
             ElementType::Command {
                 start_command,

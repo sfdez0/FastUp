@@ -23,7 +23,7 @@ struct Cli {
 /// Enum to define subcommands for the CLI.
 /// - `up`: Starts an element
 /// - `status`: Checks the status of the elements.
-/// - `close`: Closes an element
+/// - `down`: Closes an element
 #[derive(Subcommand)]
 enum Commands {
     /// Start an element
@@ -32,8 +32,8 @@ enum Commands {
         name: String,
     },
     /// Close the element
-    Close {
-        /// Name of the element to close
+    Down {
+        /// Name of the element to stop
         name: String,
     },
     /// Check the status of the elements
@@ -51,8 +51,8 @@ fn main() {
         Commands::Status => {
             cmd_status(true);
         }
-        Commands::Close { name } => {
-            cmd_close(name);
+        Commands::Down { name } => {
+            cmd_down(name);
         }
     }
 }
@@ -142,8 +142,8 @@ fn cmd_status(print: bool) {
     }
 }
 
-/// Function to close the element as defined in the config file
-fn cmd_close(name: &str) {
+/// Function to stop the element as defined in the config file
+fn cmd_down(name: &str) {
     // Refresh the status and load the config
     let config = refresh_status();
 
@@ -154,7 +154,7 @@ fn cmd_close(name: &str) {
         .find(|e| e.name == name)
         .expect("ERROR: Element not found inside fastup.yaml");
 
-    println!("Closing element {}...", element.name.green());
+    println!("Stopping element {}...", element.name.green());
 
     let mut state = FastUpState::load();
 
