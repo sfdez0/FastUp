@@ -5,6 +5,7 @@ use std::process::{Command, Stdio};
 use sysinfo::{Pid, System};
 
 use crate::state::FastUpState;
+use crate::{success, warn};
 
 /// Struct to store information about a running element
 #[derive(Serialize, Deserialize, Clone)]
@@ -118,12 +119,16 @@ impl ElementType {
                         state.elements.remove(command);
                         state.save()?;
 
-                        println!("Element {} stopped with PID: {}", command.green(), pid);
+                        success!(
+                            "Element {} stopped with PID: {}",
+                            command.green().bold(),
+                            pid.to_string().green().bold()
+                        );
                     }
                 } else {
-                    println!(
+                    warn!(
                         "The PID {} is not running the expected element {}. It might have been started manually or by another tool.",
-                        pid,
+                        pid.to_string().red().bold(),
                         command.red()
                     );
                 }
@@ -145,7 +150,7 @@ impl ElementType {
                 state.elements.remove(command);
                 state.save()?;
 
-                println!("Service {} stopped", service_name.green());
+                success!("Service {} stopped", service_name.green().bold());
                 Ok(())
             }
         }

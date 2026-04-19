@@ -7,6 +7,7 @@ use crate::state::FastUpState;
 use crate::utils::check_port;
 use crate::utils::get_process_listening_on_port;
 use crate::utils::is_service_active;
+use crate::warn;
 
 /// Path to the config file
 pub const CONFIG_FILE: &str = "config/fastup.yaml";
@@ -34,7 +35,7 @@ pub fn refresh_status() -> FastUpConfig {
 
     // Clean up dead elements from state and save
     if let Err(e) = state.cleanup_dead_elements() {
-        eprintln!("Warning: Failed to update element state: {}", e);
+        warn!("Failed to update element state: {}", e);
     }
 
     // Check for externally running elements
@@ -70,8 +71,8 @@ pub fn refresh_status() -> FastUpConfig {
                     element_type_str.to_string(),
                 )
             {
-                eprintln!(
-                    "Warning: Failed to register external element {}: {}",
+                warn!(
+                    "Failed to register external element {}: {}",
                     element.name, e
                 );
             }

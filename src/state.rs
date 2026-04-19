@@ -6,6 +6,7 @@ use std::path::Path;
 use sysinfo::{Pid, System};
 
 use crate::elements::ElementInfo;
+use crate::info;
 
 /// Path to the state file
 pub const STATE_FILE: &str = "logs/fastup_state.json";
@@ -102,7 +103,7 @@ impl FastUpState {
     /// - `command`: Name of the element to validate
     /// - `element_start_cmd`: Expected start command for the element, used to verify that the running PID corresponds to the correct element
     pub fn validate(&self, command: &str, element_start_cmd: &str) -> bool {
-        println!("Validating element '{}'...", command);
+        info!("Validating element '{}'...", command);
 
         if let Some(info) = self.elements.get(command) {
             // Refresh system info (only processes)
@@ -123,15 +124,15 @@ impl FastUpState {
                 // Check if the full command contains the expected start command for the element
                 let res = full_cmd.contains(element_start_cmd);
                 if res {
-                    println!(
+                    info!(
                         "PID {} is running and matches the expected command for element '{}'.",
-                        info.pid,
+                        info.pid.to_string().green(),
                         command.green()
                     );
                 } else {
-                    println!(
+                    info!(
                         "PID {} is running but does not match the expected command for element '{}'.",
-                        info.pid,
+                        info.pid.to_string().red(),
                         command.red()
                     );
                 }

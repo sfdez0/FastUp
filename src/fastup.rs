@@ -6,6 +6,7 @@ use fastup::config::refresh_status;
 use fastup::elements::ElementType;
 use fastup::state::FastUpState;
 use fastup::utils::{check_port, get_process_listening_on_port, print_status};
+use fastup::{error, info, success, warn};
 
 /// Struct to define the CLI structure using clap
 #[derive(Parser)]
@@ -70,7 +71,7 @@ fn cmd_up(name: &str) {
         .find(|e| e.name == name)
         .expect("Element not found inside fastup.yaml");
 
-    println!("Starting element {}...", element.name.green());
+    info!("Starting element {}...", element.name.green().bold());
 
     match &element.element_type {
         ElementType::Command { .. } => {
@@ -81,17 +82,18 @@ fn cmd_up(name: &str) {
                     if let Err(e) =
                         state.register_element(element.name.clone(), pid, "Command".to_string())
                     {
-                        eprintln!("Warning: Failed to save command element state: {}", e);
+                        warn!("Failed to save command element state: {}", e);
                     }
-                    println!(
+
+                    info!(
                         "Command element {} started with PID: {}",
-                        element.name.green(),
-                        pid
+                        element.name.green().bold(),
+                        pid.to_string().green()
                     );
                 }
-                Err(e) => eprintln!(
+                Err(e) => error!(
                     "Failed to start command element {}: {}",
-                    element.name.red(),
+                    element.name.red().bold(),
                     e
                 ),
             }
@@ -104,17 +106,17 @@ fn cmd_up(name: &str) {
                     if let Err(e) =
                         state.register_element(element.name.clone(), 0, "Service".to_string())
                     {
-                        eprintln!("Warning: Failed to save service element state: {}", e);
+                        warn!("Warning: Failed to save service element state: {}", e);
                     }
 
-                    println!(
+                    success!(
                         "Service element {} started successfully",
-                        element.name.green()
+                        element.name.green().bold()
                     );
                 }
-                Err(e) => eprintln!(
+                Err(e) => error!(
                     "Failed to start service element {}: {}",
-                    element.name.red(),
+                    element.name.red().bold(),
                     e
                 ),
             }
@@ -129,7 +131,7 @@ fn cmd_status(print: bool) {
     let config = refresh_status();
 
     if print {
-        println!("FastUp: Checking element status...");
+        info!("Checking element status...");
         println!("{:-<45}", "");
     }
 
@@ -154,7 +156,7 @@ fn cmd_down(name: &str) {
         .find(|e| e.name == name)
         .expect("ERROR: Element not found inside fastup.yaml");
 
-    println!("Stopping element {}...", element.name.green());
+    info!("Stopping element {}...", element.name.green().bold());
 
     let mut state = FastUpState::load();
 
@@ -175,27 +177,28 @@ fn cmd_down(name: &str) {
 
                 // If the cached PID is not running, try to find the current PID of the element.
                 if sys.process(Pid::from(pid)).is_none() {
-                    println!(
+                    warn!(
                         "Warning: Cached PID {} is no longer running. Searching for current process...",
-                        pid
+                        pid.to_string().yellow().bold()
                     );
 
                     // Try to find the current PID of the element by checking the port
                     if let Some(new_pid) = get_process_listening_on_port(element.port) {
-                        println!(
+                        info!(
                             "Found element {} on port {} with PID: {}",
-                            element.name.green(),
-                            element.port,
-                            new_pid
+                            element.name.green().bold(),
+                            element.port.to_string().green(),
+                            new_pid.to_string().green()
                         );
+
                         pid = new_pid;
                     }
 
-                    // If the PID is still not found or not running, print a warning and return
+                    // If the PID is still not found or not running, print an error and return
                     if pid == 0 || sys.process(Pid::from(pid)).is_none() {
-                        println!(
+                        error!(
                             "Could not find a running process for command element {}. It may have already been stopped.",
-                            element.name.red()
+                            element.name.red().bold()
                         );
                         return;
                     }
@@ -203,16 +206,16 @@ fn cmd_down(name: &str) {
 
                 match element.element_type.stop(pid, &mut state, &element.name) {
                     Ok(_) => { /* Success message already printed in stop() */ }
-                    Err(e) => eprintln!(
+                    Err(e) => error!(
                         "Failed to stop command element {}: {}",
-                        element.name.red(),
+                        element.name.red().bold(),
                         e
                     ),
                 }
             } else {
-                println!(
+                error!(
                     "No record found for command element {}. It might not have been started with fastup or it was already closed.",
-                    element.name.red()
+                    element.name.red().bold()
                 );
             }
         }
@@ -220,9 +223,9 @@ fn cmd_down(name: &str) {
             // Service -> Stop the service using systemctl
             match element.element_type.stop(0, &mut state, &element.name) {
                 Ok(_) => { /* Success message already printed in stop() */ }
-                Err(e) => eprintln!(
+                Err(e) => error!(
                     "Failed to stop service element {}: {}",
-                    element.name.red(),
+                    element.name.red().bold(),
                     e
                 ),
             }
