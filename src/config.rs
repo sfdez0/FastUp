@@ -7,7 +7,7 @@ use crate::state::FastUpState;
 use crate::utils::check_port;
 use crate::utils::get_process_listening_on_port;
 use crate::utils::is_service_active;
-use crate::warn;
+use crate::{error, warn};
 
 /// Path to the config file
 pub const CONFIG_FILE: &str = "config/fastup.yaml";
@@ -21,9 +21,21 @@ pub struct FastUpConfig {
 
 /// Function to load the configuration from the YAML file
 pub fn load_config() -> FastUpConfig {
-    let content = fs::read_to_string(CONFIG_FILE).expect("Could not find the fastup.yaml file");
+    let content = match fs::read_to_string(CONFIG_FILE) {
+        Ok(c) => c,
+        Err(e) => {
+            error!("Could not find the fastup.yaml file: {}", e);
+            panic!("Unable to continue without config file");
+        }
+    };
 
-    serde_yml::from_str(&content).expect("Error parsing the fastup.yaml file")
+    match serde_yml::from_str(&content) {
+        Ok(config) => config,
+        Err(e) => {
+            error!("Error parsing the fastup.yaml file: {}", e);
+            panic!("Unable to parse config file");
+        }
+    }
 }
 
 /// Function to refresh the status of the elements by cleaning up dead elements from the state and checking for externally running elements

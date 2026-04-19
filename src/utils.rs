@@ -3,6 +3,8 @@ use std::net::{TcpStream, ToSocketAddrs};
 use std::process::Command;
 use std::time::Duration;
 
+use crate::error;
+
 /// Function to check if a specific port is open on the localhost
 /// - `host`: Host to check
 /// - `port`: Port to check
@@ -48,14 +50,18 @@ pub fn get_process_listening_on_port(port: u16) -> Option<usize> {
 /// Function to check if a system element is active using systemctl
 /// - `element_name`: Name of the binary to check
 pub fn is_service_active(element_name: &str) -> bool {
-    let status = Command::new("systemctl")
+    match Command::new("systemctl")
         .arg("is-active")
         .arg("--quiet")
         .arg(element_name)
         .status()
-        .expect("Error occurred while checking element status");
-
-    status.success()
+    {
+        Ok(status) => status.success(),
+        Err(e) => {
+            error!("Error occurred while checking element status: {}", e);
+            false
+        }
+    }
 }
 
 /// Function to print the status of a element in a formatted way

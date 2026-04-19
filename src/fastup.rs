@@ -65,11 +65,16 @@ fn cmd_up(name: &str) {
     let config = refresh_status();
 
     // Find the element in the config by name
-    let element = config
-        .elements_config
-        .iter()
-        .find(|e| e.name == name)
-        .expect("Element not found inside fastup.yaml");
+    let element = match config.elements_config.iter().find(|e| e.name == name) {
+        Some(elem) => elem,
+        None => {
+            error!(
+                "Element not found inside fastup.yaml: {}",
+                name.red().bold()
+            );
+            return;
+        }
+    };
 
     info!("Starting element {}...", element.name.green().bold());
 
@@ -150,11 +155,16 @@ fn cmd_down(name: &str) {
     let config = refresh_status();
 
     // Find the element in the config by name
-    let element = config
-        .elements_config
-        .iter()
-        .find(|e| e.name == name)
-        .expect("ERROR: Element not found inside fastup.yaml");
+    let element = match config.elements_config.iter().find(|e| e.name == name) {
+        Some(elem) => elem,
+        None => {
+            error!(
+                "Element not found inside fastup.yaml: {}",
+                name.red().bold()
+            );
+            return;
+        }
+    };
 
     info!("Stopping element {}...", element.name.green().bold());
 
