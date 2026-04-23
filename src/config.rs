@@ -5,12 +5,10 @@ use crate::elements::ElementConfig;
 use crate::elements::ElementType;
 use crate::state::FastUpState;
 use crate::utils::check_port;
+use crate::utils::get_config_file;
 use crate::utils::get_process_listening_on_port;
 use crate::utils::is_service_active;
 use crate::{error, warn};
-
-/// Path to the config file
-pub const CONFIG_FILE: &str = "config/fastup.yaml";
 
 /// Struct to represent the configuration of the application as defined in the YAML config file
 #[derive(Deserialize)]
@@ -21,10 +19,14 @@ pub struct FastUpConfig {
 
 /// Function to load the configuration from the YAML file
 pub fn load_config() -> FastUpConfig {
-    let content = match fs::read_to_string(CONFIG_FILE) {
+    let config_file = get_config_file();
+    let content = match fs::read_to_string(&config_file) {
         Ok(c) => c,
         Err(e) => {
-            error!("Could not find the fastup.yaml file: {}", e);
+            error!(
+                "Could not find the fastup.yaml file at {}: {}",
+                config_file, e
+            );
             panic!("Unable to continue without config file");
         }
     };

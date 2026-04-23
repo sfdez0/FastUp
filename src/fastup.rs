@@ -5,7 +5,10 @@ use sysinfo::{Pid, System};
 use fastup::config::refresh_status;
 use fastup::elements::ElementType;
 use fastup::state::FastUpState;
-use fastup::utils::{check_port, get_process_listening_on_port, print_status};
+use fastup::utils::{
+    check_port, get_config_file, get_log_file, get_logs_dir, get_process_listening_on_port,
+    print_status,
+};
 use fastup::{error, info, success, warn};
 
 /// Struct to define the CLI structure using clap
@@ -43,6 +46,34 @@ enum Commands {
 
 /// Main function that parses the CLI arguments and executes the corresponding command.
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+
+    // If no args, or help flag is provided, print the help msg
+    if args.len() == 1
+        || (args.len() == 2 && (args[1] == "help" || args[1] == "-h" || args[1] == "--help"))
+    {
+        println!("fastup - A lightweight YAML-based local process manager");
+        println!();
+        println!("USAGE:");
+        println!("    fastup <COMMAND>");
+        println!();
+        println!("COMMANDS:");
+        println!("    up       Start an element");
+        println!("    down     Stop an element");
+        println!("    status   Check the status of all elements");
+        println!("    help     Print help information");
+        println!();
+        println!("CONFIGURATION AND LOGS:");
+        println!("    Configuration file: {}", get_config_file());
+        println!("    Logs directory:     {}", get_logs_dir());
+        println!("    Log file:           {}", get_log_file());
+        println!();
+        println!("OPTIONS:");
+        println!("    -h, --help       Print help");
+        println!("    -V, --version    Print version");
+        return;
+    }
+
     let cli = Cli::parse();
 
     match &cli.fastup_command {

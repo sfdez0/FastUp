@@ -1,9 +1,46 @@
 use colored::*;
+use std::env;
+use std::fs;
 use std::net::{TcpStream, ToSocketAddrs};
 use std::process::Command;
 use std::time::Duration;
 
 use crate::error;
+
+/// Function to get the home directory of the current user
+fn get_home_dir() -> String {
+    env::var("HOME").unwrap_or_else(|_| ".".to_string())
+}
+
+/// Function to get the configuration directory path
+pub fn get_config_dir() -> String {
+    format!("{}/.config/fastup", get_home_dir())
+}
+
+/// Function to get the data directory path
+pub fn get_data_dir() -> String {
+    format!("{}/.local/share/fastup", get_home_dir())
+}
+
+/// Function to get the configuration file path
+pub fn get_config_file() -> String {
+    format!("{}/fastup.yaml", get_config_dir())
+}
+
+/// Function to get the logs directory path
+pub fn get_logs_dir() -> String {
+    format!("{}/logs", get_data_dir())
+}
+
+/// Function to get the log file path
+pub fn get_log_file() -> String {
+    format!("{}/fastup.txt", get_logs_dir())
+}
+
+/// Function to get the state file path
+pub fn get_state_file() -> String {
+    format!("{}/state.json", get_data_dir())
+}
 
 /// Function to check if a specific port is open on the localhost
 /// - `host`: Host to check
@@ -78,4 +115,28 @@ pub fn print_status(name: &str, port: u16, online: bool) {
 
     // Print the element name, port, and status
     println!("{:<20} | Port: {:<5}| {}", name.blue(), port, status_text);
+}
+
+/// Function to ensure that a directory exists, creating it if necessary
+pub fn ensure_dir(dir: &str) -> std::io::Result<()> {
+    fs::create_dir_all(dir)?;
+    Ok(())
+}
+
+/// Function to remove ANSI escape codes from a string
+pub fn strip_ansi_codes(s: &str) -> String {
+    let mut result = String::new();
+    let mut in_escape = false;
+
+    for ch in s.chars() {
+        if ch == '\x1b' {
+            in_escape = true;
+        } else if in_escape && ch == 'm' {
+            in_escape = false;
+        } else if !in_escape {
+            result.push(ch);
+        }
+    }
+
+    result
 }

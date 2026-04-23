@@ -33,4 +33,4 @@ elements_config:
       - "0.0.0.0"
       - "--port"
       - "8084"
-    log_file: "logs/fastapi.log"
+    log_file: "fastapi.log"

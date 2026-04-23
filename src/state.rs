@@ -2,14 +2,11 @@ use colored::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::{self};
-use std::path::Path;
 use sysinfo::{Pid, System};
 
 use crate::elements::ElementInfo;
 use crate::info;
-
-/// Path to the state file
-pub const STATE_FILE: &str = "logs/fastup_state.json";
+use crate::utils::{ensure_dir, get_data_dir, get_state_file};
 
 /// Struct to represent the state of the application
 #[derive(Default, Serialize, Deserialize)]
@@ -22,8 +19,9 @@ pub struct FastUpState {
 impl FastUpState {
     /// Function to load the status from the state file
     pub fn load() -> Self {
+        let state_file = get_state_file();
         // Read the state file and deserialize it, or return an empty state if the file doesn't exist or is invalid
-        fs::read_to_string(STATE_FILE)
+        fs::read_to_string(&state_file)
             .ok()
             .and_then(|content| serde_json::from_str(&content).ok())
             .unwrap_or_default()
@@ -32,16 +30,15 @@ impl FastUpState {
     /// Function to save the current state to the state file
     /// - `self`: The current state to be saved
     pub fn save(&self) -> std::io::Result<()> {
+        let state_file = get_state_file();
+        let data_dir = get_data_dir();
+
         // Ensure the directory exists
-        if let Some(parent) = Path::new(STATE_FILE).parent()
-            && !parent.as_os_str().is_empty()
-        {
-            fs::create_dir_all(parent)?;
-        }
+        ensure_dir(&data_dir)?;
 
         // Serialize the state to JSON and write it to the file
         let content = serde_json::to_string_pretty(self).unwrap();
-        fs::write(STATE_FILE, content)
+        fs::write(&state_file, content)
     }
 
     /// Register a newly started element in the state and save it

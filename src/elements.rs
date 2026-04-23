@@ -5,6 +5,7 @@ use std::process::{Command, Stdio};
 use sysinfo::{Pid, System};
 
 use crate::state::FastUpState;
+use crate::utils::{ensure_dir, get_logs_dir};
 use crate::{success, warn};
 
 /// Struct to store information about a running element
@@ -70,7 +71,18 @@ impl ElementType {
 
                 // If a log file is provided, redirect stdout and stderr to that file. Otherwise, discard the output
                 if let Some(path) = log_file {
-                    let file = OpenOptions::new().create(true).append(true).open(path)?;
+                    let logs_dir = get_logs_dir();
+                    let mut full_path = logs_dir.clone();
+                    full_path.push('/');
+                    full_path.push_str(path);
+
+                    // Ensure the logs directory exists
+                    ensure_dir(&logs_dir)?;
+
+                    let file = OpenOptions::new()
+                        .create(true)
+                        .append(true)
+                        .open(&full_path)?;
 
                     process.stdout(Stdio::from(file.try_clone()?));
                     process.stderr(Stdio::from(file));
