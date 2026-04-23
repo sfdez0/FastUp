@@ -15,7 +15,7 @@ use fastup::{error, info, success, warn};
 #[derive(Parser)]
 #[command(
     name = "fastup",
-    version = "0.1",
+    version = "0.2",
     author = "Sergio Fernández Verdugo",
     about = "A lightweight YAML-based local process manager to automate your development environment"
 )]
