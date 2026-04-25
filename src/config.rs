@@ -3,6 +3,7 @@ use std::fs::{self};
 
 use crate::elements::ElementConfig;
 use crate::elements::ElementType;
+use crate::groups::GroupConfig;
 use crate::state::FastUpState;
 use crate::utils::check_port;
 use crate::utils::get_config_file;
@@ -15,6 +16,8 @@ use crate::{error, warn};
 pub struct FastUpConfig {
     /// List of elements defined in the config file
     pub elements_config: Vec<ElementConfig>,
+    /// List of groups defined in the config file
+    pub groups_config: Vec<GroupConfig>,
 }
 
 /// Function to load the configuration from the YAML file

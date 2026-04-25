@@ -34,11 +34,19 @@ enum Commands {
     Up {
         /// Name of the element to start
         name: String,
+
+        /// Whether the name belongs to a group of elements
+        #[arg(short, long)]
+        group: bool,
     },
     /// Close the element
     Down {
         /// Name of the element to stop
         name: String,
+
+        /// Whether the name belongs to a group of elements
+        #[arg(short, long)]
+        group: bool,
     },
     /// Check the status of the elements
     Status,
@@ -77,21 +85,52 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.fastup_command {
-        Commands::Up { name } => {
-            cmd_up(name);
-        }
+        Commands::Up { name, group } => match group {
+            true => cmd_up_group(name),
+            false => cmd_up_elem(name),
+        },
+        Commands::Down { name, group } => match group {
+            true => cmd_down_group(name),
+            false => cmd_down_elem(name),
+        },
         Commands::Status => {
             cmd_status(true);
-        }
-        Commands::Down { name } => {
-            cmd_down(name);
         }
     }
 }
 
-/// Function to start an element as defined in the config file
+/// Function to start a group of elements defined in the config file
+/// - `name`: Name of the group to start
+fn cmd_up_group(name: &str) {
+    // Refresh the status and load the config
+    let config = refresh_status();
+
+    // Find the group in the config by name
+    let group = match config.groups_config.iter().find(|g| g.name == name) {
+        Some(g) => g,
+        None => {
+            error!("Group not found inside fastup.yaml: {}", name.red().bold());
+            return;
+        }
+    };
+
+    info!(
+        "Starting group {} with {} elements...",
+        group.name.green().bold(),
+        group.elements.len().to_string().green()
+    );
+
+    // Start each element in the group
+    for element_name in &group.elements {
+        cmd_up_elem(element_name);
+    }
+
+    success!("Group {} started successfully", group.name.green().bold());
+}
+
+/// Function to start an element defined in the config file
 /// - `name`: Name of the element to start
-fn cmd_up(name: &str) {
+fn cmd_up_elem(name: &str) {
     // Refresh the status and load the config
     let config = refresh_status();
 
@@ -160,28 +199,37 @@ fn cmd_up(name: &str) {
     }
 }
 
-/// Function to check the status of the elements defined in the config file and print it in a formatted way
-/// - `print`: Whether to print the status of each element
-fn cmd_status(print: bool) {
+/// Function to stop a group of elements defined in the config file
+/// - `name`: Name of the group to stop
+fn cmd_down_group(name: &str) {
     // Refresh the status and load the config
     let config = refresh_status();
 
-    if print {
-        info!("Checking element status...");
-        println!("{:-<45}", "");
+    // Find the group in the config by name
+    let group = match config.groups_config.iter().find(|g| g.name == name) {
+        Some(g) => g,
+        None => {
+            error!("Group not found inside fastup.yaml: {}", name.red().bold());
+            return;
+        }
+    };
+
+    info!(
+        "Stopping group {} with {} elements...",
+        group.name.green().bold(),
+        group.elements.len().to_string().green()
+    );
+
+    // Stop each element in the group
+    for element_name in &group.elements {
+        cmd_down_elem(element_name);
     }
 
-    if print {
-        // Print the status of each element defined in the config file
-        for element in &config.elements_config {
-            let online = check_port("127.0.0.1", element.port);
-            print_status(&element.name, element.port, online);
-        }
-    }
+    success!("Group {} stopped successfully", group.name.green().bold());
 }
 
-/// Function to stop the element as defined in the config file
-fn cmd_down(name: &str) {
+/// Function to stop the element defined in the config file
+fn cmd_down_elem(name: &str) {
     // Refresh the status and load the config
     let config = refresh_status();
 
@@ -270,6 +318,26 @@ fn cmd_down(name: &str) {
                     e
                 ),
             }
+        }
+    }
+}
+
+/// Function to check the status of the elements defined in the config file and print it in a formatted way
+/// - `print`: Whether to print the status of each element
+fn cmd_status(print: bool) {
+    // Refresh the status and load the config
+    let config = refresh_status();
+
+    if print {
+        info!("Checking element status...");
+        println!("{:-<45}", "");
+    }
+
+    if print {
+        // Print the status of each element defined in the config file
+        for element in &config.elements_config {
+            let online = check_port("127.0.0.1", element.port);
+            print_status(&element.name, element.port, online);
         }
     }
 }
