@@ -63,22 +63,22 @@ fn main() {
         println!("fastup - A lightweight YAML-based local process manager");
         println!();
         println!("USAGE:");
-        println!("    fastup <COMMAND>");
+        println!("    fastup <COMMAND> [OPTIONS] <NAME>");
         println!();
         println!("COMMANDS:");
-        println!("    up       Start an element");
-        println!("    down     Stop an element");
-        println!("    status   Check the status of all elements");
-        println!("    help     Print help information");
+        println!("    up [-g] <NAME>    Start an element (-g to start a group)");
+        println!("    down [-g] <NAME>  Stop an element (-g to stop a group)");
+        println!("    status            Check the status of all elements");
+        println!("    help              Print help information");
+        println!();
+        println!("OPTIONS:");
+        println!("    -h, --help       Print help");
+        println!("    -V, --version    Print version");
         println!();
         println!("CONFIGURATION AND LOGS:");
         println!("    Configuration file: {}", get_config_file());
         println!("    Logs directory:     {}", get_logs_dir());
         println!("    Log file:           {}", get_log_file());
-        println!();
-        println!("OPTIONS:");
-        println!("    -h, --help       Print help");
-        println!("    -V, --version    Print version");
         return;
     }
 
