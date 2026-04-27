@@ -1,6 +1,6 @@
 [package]
 name = "fastup"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 authors = ["Sergio Fernández <sergiofdez2000@gmail.com>"]
 description = "A lightweight YAML-based local process manager to automate your development environment"
