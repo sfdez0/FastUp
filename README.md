@@ -32,6 +32,17 @@ Install the binary
 
 
 ## Configuration
+
+FastUp manages its configuration and logs through standard Linux directories:
+
+| Purpose | Path |
+|---------|------|
+| Configuration file | `~/.config/fastup/fastup.yaml` |
+| Logs directory | `~/.local/share/fastup/logs` |
+| Main log file | `~/.local/share/fastup/logs/fastup.txt` |
+
+The configuration file is where you define all your services, commands, and groups. Logs are automatically created when you run commands, helping you troubleshoot and monitor activity.
+
 ```yaml
 # Example configuration file
 elements_config:
@@ -69,14 +80,35 @@ elements_config:
       - "--port"
       - "8084"
     log_file: "logs/fastapi.log"
+
+groups_config:
+  - name: "example_group_1"
+    description: "Example group 1..."
+    elements:
+      - "postgresql"
+      - "api"
+  - name: "example_group_db"
+    description: "Example group db..."
+    elements:
+      - "postgresql"
+      - "mysql"
 ```
 ## Usage
 
-`fastup up _name` Starts an element
+```fastup <COMMAND> [OPTIONS] <NAME>```
 
-`fastup down _name` Stops an element
+| Command | Options | Description |
+| - |:- |:-|
+| up | -g, -h | Start an element |
+| down | -g, -h | Stop an element |
+| status | -h | Print the status of all elements |
+| help |  | Print help |
 
-`fastup status` Prints status of elements
+| Options | Description |
+| - |:- |
+| -g | Specifies the argument is a group name |
+| -h, --help | Print help |
+| -V, --version | Print version |
 
 ## Author
 

@@ -34,3 +34,16 @@ elements_config:
       - "--port"
       - "8084"
     log_file: "fastapi.log"
+
+
+groups_config:
+  - name: "example_group_1"
+    description: "Example group 1..."
+    elements:
+      - "postgresql"
+      - "api"
+  - name: "example_group_db"
+    description: "Example group db..."
+    elements:
+      - "postgresql"
+      - "mysql"
