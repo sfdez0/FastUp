@@ -6,28 +6,27 @@ FastUp is a CLI tool designed for Linux environments to streamline your local de
 
 Everything stays local; this tool focuses purely on your machine's processes, with no cloud dependencies or remote setups.
 
-Why I built this?
-This project is my first dive into Rust. I built it to learn the language from scratch as it serves as a practical, hands-on exercise to transition from knowing zero Rust to building a functional tool for my daily use.
+> **Why I built this?**
+> This project is my first dive into Rust. I built it to learn the language from scratch as it serves as a practical, hands-on exercise to transition from knowing zero Rust to building a functional tool for my daily use.
 
 
 ## Run Locally
 
-Clone the project
-
+Clone the project:
 ```bash
-  git clone https://github.com/your-username/fastup.git
+git clone https://github.com/sfdez0/FastUp.git
 ```
 
-Go to the project directory
+Go to the project directory:
 
 ```bash
-  cd fastup
+cd FastUp
 ```
 
-Install the binary
+Install the binary:
 
 ```bash
-  cargo install --path .
+cargo install --path .
 ```
 
 
@@ -95,20 +94,36 @@ groups_config:
 ```
 ## Usage
 
-```fastup <COMMAND> [OPTIONS] <NAME>```
+The general syntax for FastUp is:
 
-| Command | Options | Description |
-| - |:- |:-|
-| up | -g, -h | Start an element |
-| down | -g, -h | Stop an element |
-| status | -h | Print the status of all elements |
-| help |  | Print help |
+```bash
+fastup <COMMAND> [OPTIONS] <NAME>
+```
 
-| Options | Description |
-| - |:- |
-| -g | Specifies the argument is a group name |
-| -h, --help | Print help |
-| -V, --version | Print version |
+### Commands
+
+* **`up`** — Starts a configured element.
+  ```bash
+  fastup up api                  # Start a single element
+  fastup up -g example_group_db  # Start a group of elements
+  ```
+
+* **`down`** — Stops a running element.
+  ```bash
+  fastup down api                  # Stop a single element
+  fastup down -g example_group_db  # Stop a group of elements
+  ```
+
+* **`status`** — Prints the current status of all elements.
+  ```bash
+  fastup status
+  ```
+
+### Global Options
+
+* `-g` : Specifies that the `<NAME>` argument is a group (defined in `groups_config`).
+* `-h, --help` : Prints help information for the command.
+* `-V, --version` : Prints the current version of FastUp.
 
 ## Author
 
