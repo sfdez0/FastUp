@@ -1,4 +1,4 @@
-[![Rust CI](https://github.com/sfdez0/FastUp/actions/workflows/rust.yml/badge.svg)](https://github.com/sfdez0/FastUp/actions/workflows/rust.yml) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://choosealicense.com/licenses/mit/)
+[![Build](https://github.com/sfdez0/FastUp/actions/workflows/build.yml/badge.svg)](https://github.com/sfdez0/FastUp/actions/workflows/build.yml) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://choosealicense.com/licenses/mit/)
 
 # FastUp
 
