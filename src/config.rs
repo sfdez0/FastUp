@@ -34,7 +34,7 @@ pub fn load_config() -> FastUpConfig {
         }
     };
 
-    match serde_yml::from_str(&content) {
+    match yaml_serde::from_str(&content) {
         Ok(config) => config,
         Err(e) => {
             error!("Error parsing the fastup.yaml file: {}", e);
